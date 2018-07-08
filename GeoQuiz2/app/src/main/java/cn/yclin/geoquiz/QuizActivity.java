@@ -27,7 +27,6 @@ public class QuizActivity extends AppCompatActivity {
     private static final int REQUEST_CODE_CHEAT = 0;
     private boolean mIsCheater;
 
-
     private Question[] mQuestionBank = new Question[]{
             new Question(R.string.question_australia,true),
             new Question(R.string.question_oceans,true),
