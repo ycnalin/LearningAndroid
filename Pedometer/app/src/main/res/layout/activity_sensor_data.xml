@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SensorDataActivity">
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/Sensor_Title"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.501"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.152" />
+
+    <TextView
+        android:id="@+id/x_textView"
+        android:layout_width="52dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="16dp"
+        android:padding="4dp"
+        android:text="@string/axisX"
+        android:textAlignment="center"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/gyrox"
+        app:layout_constraintStart_toEndOf="@+id/gyro_textView" />
+
+    <TextView
+        android:id="@+id/y_textView"
+        android:layout_width="52dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:padding="4dp"
+        android:text="@string/axisY"
+        android:textAlignment="center"
+        android:textSize="18sp"
+        app:layout_constraintBaseline_toBaselineOf="@+id/x_textView"
+        app:layout_constraintStart_toEndOf="@+id/x_textView" />
+
+    <TextView
+        android:id="@+id/z_textView"
+        android:layout_width="52dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:padding="4dp"
+        android:text="@string/axisZ"
+        android:textAlignment="center"
+        android:textSize="18sp"
+        app:layout_constraintBaseline_toBaselineOf="@+id/y_textView"
+        app:layout_constraintStart_toEndOf="@+id/y_textView" />
+
+    <TextView
+        android:id="@+id/gyro_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="140dp"
+        android:layout_marginTop="68dp"
+        android:text="@string/gyro"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="@+id/textView4"
+        app:layout_constraintTop_toBottomOf="@+id/textView4" />
+
+    <TextView
+        android:id="@+id/accelerator_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/accel"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="@+id/gyro_textView"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/gyro_textView"
+        app:layout_constraintTop_toBottomOf="@+id/gyro_textView" />
+
+    <TextView
+        android:id="@+id/magnetometer_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/magnet"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="@+id/accelerator_textView"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/accelerator_textView"
+        app:layout_constraintTop_toBottomOf="@+id/accelerator_textView" />
+
+    <TextView
+        android:id="@+id/gyrox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_weight="1"
+        android:padding="4dp"
+        android:textAlignment="center"
+        app:layout_constraintBaseline_toBaselineOf="@+id/gyro_textView"
+        app:layout_constraintEnd_toEndOf="@+id/x_textView"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/x_textView"
+        tools:text="124.24" />
+
+    <TextView
+        android:id="@+id/gyroy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_weight="1"
+        android:padding="4dp"
+        android:textAlignment="center"
+        app:layout_constraintBaseline_toBaselineOf="@+id/gyrox"
+        app:layout_constraintStart_toEndOf="@+id/gyrox"
+        tools:text="124.24" />
+
+    <TextView
+        android:id="@+id/gryoz"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_weight="1"
+        android:padding="4dp"
+        android:textAlignment="center"
+        app:layout_constraintBaseline_toBaselineOf="@+id/gyroy"
+        app:layout_constraintStart_toEndOf="@+id/gyroy"
+        tools:text="124.24" />
+
+
+    <TextView
+        android:id="@+id/accx"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_weight="1"
+        android:padding="4dp"
+        android:textAlignment="center"
+        app:layout_constraintBaseline_toBaselineOf="@+id/accelerator_textView"
+        app:layout_constraintEnd_toEndOf="@+id/gyrox"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/gyrox"
+        tools:text="124.24" />
+
+    <TextView
+        android:id="@+id/accy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_weight="1"
+        android:padding="4dp"
+        android:textAlignment="center"
+        app:layout_constraintBaseline_toBaselineOf="@+id/accx"
+        app:layout_constraintStart_toEndOf="@+id/accx"
+        tools:text="124.24" />
+
+    <TextView
+        android:id="@+id/accz"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_weight="1"
+        android:padding="4dp"
+        android:textAlignment="center"
+        app:layout_constraintBaseline_toBaselineOf="@+id/accy"
+        app:layout_constraintStart_toEndOf="@+id/accy"
+        tools:text="124.24" />
+
+    <TextView
+        android:id="@+id/magx"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_weight="1"
+        android:padding="4dp"
+        android:textAlignment="center"
+        app:layout_constraintBaseline_toBaselineOf="@+id/magnetometer_textView"
+        app:layout_constraintEnd_toEndOf="@+id/accx"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="@+id/accx"
+        tools:text="124.24" />
+
+    <TextView
+        android:id="@+id/magy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_weight="1"
+        android:padding="4dp"
+        android:textAlignment="center"
+        app:layout_constraintBaseline_toBaselineOf="@+id/magx"
+        app:layout_constraintStart_toEndOf="@+id/magx"
+        tools:text="124.24" />
+
+    <TextView
+        android:id="@+id/magz"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_weight="1"
+        android:padding="4dp"
+        android:textAlignment="center"
+        app:layout_constraintBaseline_toBaselineOf="@+id/magy"
+        app:layout_constraintStart_toEndOf="@+id/magy"
+        tools:text="124.24" />
+
+    <Button
+        android:id="@+id/chart_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="@string/chart_view"
+        app:layout_constraintStart_toStartOf="@+id/magnetometer_textView"
+        app:layout_constraintTop_toBottomOf="@+id/magnetometer_textView" />
+
+    <Button
+        android:id="@+id/pedometer_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="@string/pedometer"
+        app:layout_constraintBaseline_toBaselineOf="@+id/chart_button"
+        app:layout_constraintEnd_toEndOf="@+id/magz"
+        app:layout_constraintStart_toEndOf="@+id/chart_button" />
+
+</android.support.constraint.ConstraintLayout>

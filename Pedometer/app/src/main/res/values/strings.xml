@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Pedometer</string>
+    <string name="Sensor_Title">IMU Data</string>
+    <string name="gyro">Gyro</string>
+    <string name="accel">Acc</string>
+    <string name="magnet">Mag</string>
+    <string name="chart_view">ChartView</string>
+    <string name="pedometer">Pedometer</string>
+    <string name="axisX">X</string>
+    <string name="axisY">Y</string>
+    <string name="axisZ">Z</string>
+</resources>
