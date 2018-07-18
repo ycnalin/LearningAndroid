@@ -18,6 +18,7 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class DynamicLineChartManager {
 
@@ -30,7 +31,7 @@ public class DynamicLineChartManager {
     private LineData lineData;
     private LineDataSet lineDataSet;
     private List<ILineDataSet> lineDataSets = new ArrayList<>();
-    private SimpleDateFormat df = new SimpleDateFormat("ss");
+    private SimpleDateFormat df = new SimpleDateFormat("ss", Locale.getDefault());
     private List<String> timeList = new ArrayList<>();
 
     private int Counter = 0;

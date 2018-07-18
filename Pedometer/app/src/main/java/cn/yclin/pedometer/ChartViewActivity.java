@@ -1,11 +1,17 @@
 package cn.yclin.pedometer;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,6 +19,8 @@ import android.util.Log;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.YAxis;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -20,7 +28,7 @@ import java.util.Locale;
 
 public class ChartViewActivity extends AppCompatActivity {
 
-    private static final String TAG = "QuizActivity";
+    private static final String TAG = "ChartViewActivity";
 
     private DynamicLineChartManager dynamicLineChartManager;
     private DynamicLineChartManager dynamicLineChartManager1;
@@ -32,10 +40,15 @@ public class ChartViewActivity extends AppCompatActivity {
     private List<String> names1 = new ArrayList<>();
     private List<String> names2 = new ArrayList<>();
     private List<Integer> colour = new ArrayList<>();
-//    private List<Integer> colour1 = new ArrayList<>();
-//    private List<Integer> colour2 = new ArrayList<>();
 
     private SensorManager sensorManager;
+    private Sensor sensora;
+    private Sensor sensorg;
+    private Sensor sensorm;
+
+    private FileIO filewriter;
+    private SimpleDateFormat df = new SimpleDateFormat("yyyy_MMdd_HHmmss.'csv'",Locale.getDefault());
+
 
 
     @Override
@@ -46,7 +59,6 @@ public class ChartViewActivity extends AppCompatActivity {
         LineChart mLineChart = findViewById(R.id.line_chart);
         LineChart mLineChart1 = findViewById(R.id.line_chart2);
         LineChart mLineChart2 = findViewById(R.id.line_chart3);
-
 
         YAxis right = mLineChart.getAxisRight();
         right.setDrawLabels(false);
@@ -80,12 +92,24 @@ public class ChartViewActivity extends AppCompatActivity {
         dynamicLineChartManager2.setYAxis(120, -120, 10);
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        Sensor sensora = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        sensora = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        sensorg = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+        sensorm = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         sensorManager.registerListener(listenera, sensora, SensorManager.SENSOR_DELAY_GAME);
-        Sensor sensorg = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
         sensorManager.registerListener(listenerg, sensorg, SensorManager.SENSOR_DELAY_GAME);
-        Sensor sensorm = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         sensorManager.registerListener(listenerm, sensorm, SensorManager.SENSOR_DELAY_GAME);
+
+        try {
+            PackageInfo pkgInfo = getPackageManager().getPackageInfo(getApplication().getPackageName(), 0);
+            String appName = pkgInfo.applicationInfo.loadLabel(getPackageManager()).toString();
+            filewriter = new FileIO(Environment.getExternalStorageDirectory().toString()+ File.separator+appName);
+
+            String filename = df.format(System.currentTimeMillis());
+            //Log.d(TAG,filename);
+            filewriter.setFileToWrite(filename);
+        }catch (Exception e) {
+            Log.d(TAG,Log.getStackTraceString(e));
+        }
     }
 
     private SensorEventListener listenera = new SensorEventListener() {
@@ -94,9 +118,10 @@ public class ChartViewActivity extends AppCompatActivity {
             list.add(event.values[0]);  //gyrox
             list.add(event.values[1]);  //gyroy
             list.add(event.values[2]);  //gyroz
+
             dynamicLineChartManager1.addEntry(list);
             list.clear();
-
+            filewriter.writeFile(event.timestamp/100,event.values[0]*100,event.values[1]*100,event.values[2]*100);
         }
 
         @Override
@@ -138,13 +163,20 @@ public class ChartViewActivity extends AppCompatActivity {
 
     };
 
+
+    /*
+    ** 息屏时继续工作
+     */
     @Override
-    protected void onDestroy() {
+    protected void onDestroy(){
         super.onDestroy();
         if (sensorManager != null) {
             sensorManager.unregisterListener(listenera);
             sensorManager.unregisterListener(listenerg);
             sensorManager.unregisterListener(listenerm);
+            filewriter.closeFile();
         }
     }
+
+
 }
