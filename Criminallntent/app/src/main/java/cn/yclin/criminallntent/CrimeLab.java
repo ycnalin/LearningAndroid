@@ -35,4 +35,8 @@ public class CrimeLab {
         }
         return null;
     }
+
+    public List<Crime> getmCrimes() {
+        return mCrimes;
+    }
 }
