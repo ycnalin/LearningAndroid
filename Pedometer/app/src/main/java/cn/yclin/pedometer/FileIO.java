@@ -40,7 +40,7 @@ public class FileIO {
 
     public void writeFile(long time,float a, float b,float c){
         try{
-            bw.write(String.format(Locale.getDefault(),"%d,%.2f,%.2f,%.2f",time,a,b,c));
+            bw.write(String.format(Locale.getDefault(),"%d,%.3f,%.3f,%.3f",time,a,b,c));
             bw.newLine();
         }catch (Exception e){
             Log.d(TAG,Log.getStackTraceString(e));

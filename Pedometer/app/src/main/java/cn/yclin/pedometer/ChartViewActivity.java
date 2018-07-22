@@ -121,7 +121,7 @@ public class ChartViewActivity extends AppCompatActivity {
 
             dynamicLineChartManager1.addEntry(list);
             list.clear();
-            filewriter.writeFile(System.currentTimeMillis()/1000,event.values[0]*100,event.values[1]*100,event.values[2]*100);
+            filewriter.writeFile(event.timestamp/100,event.values[0]*100,event.values[1]*100,event.values[2]*100);
         }
 
         @Override

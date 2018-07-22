@@ -82,7 +82,8 @@ public class SensorDataActivity extends AppCompatActivity {
         mPedometer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                Intent intent = new Intent(SensorDataActivity.this, PedometerActivity.class);
+                startActivity(intent);
             }
         });
     }

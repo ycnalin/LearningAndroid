@@ -147,7 +147,7 @@ public class DynamicLineChartManager {
             lineData.addDataSet(lineDataSet);
         }
         lineChart.setData(lineData);
-        //避免集合数据过多，及时清空（做这样的处理，并不知道有没有用，但还是这样做了）
+
         if (timeList.size() > 20) {
             timeList.clear();
         }

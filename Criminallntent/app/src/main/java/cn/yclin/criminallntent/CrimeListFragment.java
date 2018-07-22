@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,6 +41,7 @@ public class CrimeListFragment extends Fragment {
     private class CrimeHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         private TextView mTitleTextView;
         private TextView mDateTextView;
+        private Button mCallPoliceButton;
         private Crime mCrime;
 
         public CrimeHolder(LayoutInflater inflater, ViewGroup parent) {
@@ -48,6 +50,22 @@ public class CrimeListFragment extends Fragment {
             mTitleTextView = itemView.findViewById(R.id.crime_title);
             mDateTextView = itemView.findViewById(R.id.crime_date);
         }
+
+        public CrimeHolder(LayoutInflater inflater, ViewGroup parent, int viewType) {
+            super(inflater.inflate(R.layout.list_item_crime_terrible, parent, false));
+
+            itemView.setOnClickListener(this);
+            mTitleTextView = itemView.findViewById(R.id.crime_title);
+            mDateTextView = itemView.findViewById(R.id.crime_date);
+            mCallPoliceButton = itemView.findViewById(R.id.call_police);
+            mCallPoliceButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    // call police
+                }
+            });
+        }
+
 
         @Override
         public void onClick(View view) {
@@ -61,8 +79,6 @@ public class CrimeListFragment extends Fragment {
         }
     }
 
-
-
     private class CrimeAdapter extends RecyclerView.Adapter<CrimeHolder> {
         private List<Crime> mCrimes;
         public CrimeAdapter(List<Crime> crimes) {
@@ -73,8 +89,15 @@ public class CrimeListFragment extends Fragment {
         @Override
         public CrimeHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
+            CrimeHolder holder;
+            if(viewType == 0){
+                holder = new CrimeHolder(layoutInflater, parent);
+            }else
+            {
+                holder = new CrimeHolder(layoutInflater, parent, viewType);
+            }
 
-            return new CrimeHolder(layoutInflater, parent);
+            return holder;
         }
 
         @Override
@@ -82,6 +105,11 @@ public class CrimeListFragment extends Fragment {
             Crime crime = mCrimes.get(position);
             holder.bind(crime);
 
+        }
+
+        @Override
+        public int getItemViewType(int position) {
+            return mCrimes.get(position).getmRequiresPolice();
         }
 
         @Override
