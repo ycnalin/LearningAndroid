@@ -3,13 +3,15 @@ package cn.yclin.criminallntent;
 import android.content.Context;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
 public class CrimeLab {
     private static CrimeLab sCrimeLab;
-    private List<Crime> mCrimes;
+    private Map<UUID, Crime> mCrimes;
     private static double mCrimeRate = 1.1;
 
     public static CrimeLab get(Context context) {
@@ -20,7 +22,7 @@ public class CrimeLab {
     }
 
     private CrimeLab(Context context) {
-        mCrimes = new ArrayList<>();
+        mCrimes = new LinkedHashMap<>();
 
         for (int i = 0; i < 100; i++) {
             Crime crime = new Crime();
@@ -30,17 +32,12 @@ public class CrimeLab {
                 crime.setmRequiresPolice(1);
                 crime.setmTitle("Terrible Crime #" + i);
             }
-            mCrimes.add(crime);
+            mCrimes.put(crime.getmId(),crime);
         }
     }
 
     public Crime getCrime(UUID id) {
-        for (Crime crime : mCrimes) {
-            if (crime.getmId().equals(id)) {
-                return crime;
-            }
-        }
-        return null;
+        return mCrimes.get(id);
     }
 
     public static double getmCrimeRate() {
@@ -52,6 +49,6 @@ public class CrimeLab {
     }
 
     public List<Crime> getmCrimes() {
-        return mCrimes;
+        return new ArrayList<>(mCrimes.values());
     }
 }
