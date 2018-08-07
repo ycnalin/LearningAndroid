@@ -25,7 +25,7 @@ public class CrimeListFragment extends Fragment {
     private CrimeAdapter mAdapter;
     private int mClickedCrimePosition;
     private final SimpleDateFormat sdf =
-            new SimpleDateFormat("EEEE, MMM dd yyyy", Locale.ENGLISH);
+            new SimpleDateFormat("hh:mm a EEEE, MMM dd yyyy", Locale.ENGLISH);
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -52,7 +52,8 @@ public class CrimeListFragment extends Fragment {
             mCrimeRecyclerView.setAdapter(mAdapter);
         }
         else{
-            mAdapter.notifyItemChanged(mClickedCrimePosition);
+            //mAdapter.notifyItemChanged(mClickedCrimePosition);
+            mAdapter.notifyDataSetChanged();
         }
     }
 
