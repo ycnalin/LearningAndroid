@@ -11,6 +11,8 @@ import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.DatePicker;
 
 import java.util.Calendar;
@@ -25,6 +27,9 @@ public class DatePickerFragment extends DialogFragment {
             "cn.yclin.android.criminalintent.date";
 
     private DatePicker mDatePicker;
+    private Button mPositiveButton;
+    private Button mNegativeButton;
+    private Calendar mCalendar = Calendar.getInstance();
 
     public static DatePickerFragment newInstance(Date date) {
         Bundle args = new Bundle();
@@ -34,47 +39,61 @@ public class DatePickerFragment extends DialogFragment {
         return fragment;
     }
 
-    @NonNull
+    @Nullable
     @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        Date date = (Date)getArguments().getSerializable(ARG_DATE);
-        final Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.dialog_date, container,false);
 
-        View v = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_date,null);
-        mDatePicker = v.findViewById(R.id.dialog_date_picker);
+        Date date = (Date)getArguments().getSerializable(ARG_DATE);
+
+        mCalendar.setTime(date);
+        int year = mCalendar.get(Calendar.YEAR);
+        int month = mCalendar.get(Calendar.MONTH);
+        int day = mCalendar.get(Calendar.DAY_OF_MONTH);
+
+        mDatePicker = view.findViewById(R.id.date_picker);
         mDatePicker.init(year, month, day, null);
 
+        mPositiveButton = view.findViewById(R.id.dialog_date_ok_button);
+        mPositiveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int year = mDatePicker.getYear();
+                int month = mDatePicker.getMonth();
+                int day = mDatePicker.getDayOfMonth();
+                mCalendar.set(year,month,day);
+                Date date = mCalendar.getTime();
+                sendResult(Activity.RESULT_OK, date);
+                getActivity().finish();
+            }
+        });
 
-        return new AlertDialog.Builder(getActivity())
-                .setView(v)
-                .setTitle(R.string.date_picker_title)
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        int year = mDatePicker.getYear();
-                        int month = mDatePicker.getMonth();
-                        int day = mDatePicker.getDayOfMonth();
-                        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-                        int minute = calendar.get(Calendar.MINUTE);
-                        Date date = new GregorianCalendar(year, month, day, hour, minute).getTime();
-                        sendResult(Activity.RESULT_OK, date);
-                    }
-                })
-                .create();
+        mNegativeButton = view.findViewById(R.id.dialog_date_cancel_button);
+        mNegativeButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                getActivity().finish();
+            }
+        });
+
+        return view;
+
     }
 
     private void sendResult(int resultCode, Date date) {
-        if (getTargetFragment() == null) {
-            return;
-        }
 
         Intent intent = new Intent();
         intent.putExtra(EXTRA_DATE, date);
-        getTargetFragment()
-                .onActivityResult(getTargetRequestCode(), resultCode, intent);
+
+        if (getTargetFragment() == null) {
+            getActivity().setResult(resultCode, intent);
+        }
+        else{
+            getTargetFragment()
+                    .onActivityResult(getTargetRequestCode(), resultCode, intent);
+        }
+
     }
 }

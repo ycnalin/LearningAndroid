@@ -1,7 +1,9 @@
 package cn.yclin.criminallntent;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -44,6 +46,12 @@ public class CrimeFragment extends Fragment {
         return fragment;
     }
 
+    public static boolean isTabletDevice(Context context) {
+        return (context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) >=
+                Configuration.SCREENLAYOUT_SIZE_LARGE;
+    }
+
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,12 +92,20 @@ public class CrimeFragment extends Fragment {
         mDateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentManager manager = getFragmentManager();
-                //DatePickerFragment dialog = new DatePickerFragment();
-                DatePickerFragment dialog = DatePickerFragment
-                        .newInstance(mCrime.getmDate());
-                dialog.setTargetFragment(CrimeFragment.this, REQUEST_DATE);
-                dialog.show(manager, DIALOG_DATE);
+
+                if(isTabletDevice(getContext())){
+                    FragmentManager manager = getFragmentManager();
+                    //DatePickerFragment dialog = new DatePickerFragment();
+                    DatePickerFragment dialog = DatePickerFragment
+                            .newInstance(mCrime.getmDate());
+                    dialog.setTargetFragment(CrimeFragment.this, REQUEST_DATE);
+                    dialog.show(manager, DIALOG_DATE);
+                }
+                else{
+                    Intent intent = DatePickerActivity.newIntent(getActivity(), mCrime.getmDate());
+                    startActivityForResult(intent, REQUEST_DATE);
+                }
+
             }
         });
 
