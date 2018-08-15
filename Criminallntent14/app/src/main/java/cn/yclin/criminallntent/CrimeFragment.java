@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
@@ -18,6 +19,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.ShareCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,6 +30,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -44,21 +47,23 @@ public class CrimeFragment extends Fragment {
 
     private Button mSuspectButton;
     private Button mReportButton;
+    private Button mCallSuspect;
 
     private static final String ARG_CRIME_ID = "crime_id";
     private static final String DIALOG_DATE = "DialogDate";
     private static final String DIALOG_TIME = "DialogTime";
 
+    private static final String TAG = "CrimeFragment";
+
     private static final int REQUEST_DATE = 0;
     private static final int REQUEST_TIME = 1;
     private static final int REQUEST_CONTACT = 2;
 
-    // Storage Permissions
+    // Contact Permissions
     private static final int REQUEST_READ_CONTACTS = 1;
     private static String[] PERMISSIONS_CONTACTS = {
             Manifest.permission.READ_CONTACTS
     };
-
 
     public static CrimeFragment newInstance(UUID crimeId) {
         Bundle args = new Bundle();
@@ -84,13 +89,6 @@ public class CrimeFragment extends Fragment {
 
         setHasOptionsMenu(true);
 
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        CrimeLab.get(getActivity())
-                .updateCrime(mCrime);
     }
 
     @Nullable
@@ -171,6 +169,7 @@ public class CrimeFragment extends Fragment {
                 startActivityForResult(pickContact, REQUEST_CONTACT);
             }
         });
+
         if (mCrime.getSuspect() != null) {
             mSuspectButton.setText(mCrime.getSuspect());
         }
@@ -184,13 +183,6 @@ public class CrimeFragment extends Fragment {
         mReportButton = v.findViewById(R.id.crime_report);
         mReportButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-//                Intent i = new Intent(Intent.ACTION_SEND);
-//                i.setType("text/plain");
-//                i.putExtra(Intent.EXTRA_TEXT, getCrimeReport());
-//                i.putExtra(Intent.EXTRA_SUBJECT,
-//                        getString(R.string.crime_report_subject));
-//                i = Intent.createChooser(i, getString(R.string.send_report));
-//                startActivity(i);
 
                 Intent shareIntent =   ShareCompat.IntentBuilder.from(getActivity())
                         .setChooserTitle(getString(R.string.send_report))
@@ -203,7 +195,31 @@ public class CrimeFragment extends Fragment {
             }
         });
 
+        mCallSuspect = v.findViewById(R.id.call_suspect);
+        mCallSuspect.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                if(!checkPermission()){
+                    requestPermissions(getActivity());
+                }
+                else{
+                    dialContact();
+                }
+            }
+        });
+
+        if(mCrime.getSuspect() == null){
+            mCallSuspect.setEnabled(false);
+        }
+
         return v;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        CrimeLab.get(getActivity())
+                .updateCrime(mCrime);
     }
 
     @Override
@@ -252,6 +268,8 @@ public class CrimeFragment extends Fragment {
                 String suspect = c.getString(0);
                 mCrime.setSuspect(suspect);
                 mSuspectButton.setText(suspect);
+                //Enable CallSuspect Button
+                mCallSuspect.setEnabled(true);
             } finally {
                 c.close();
             }
@@ -315,17 +333,88 @@ public class CrimeFragment extends Fragment {
         return report;
     }
 
-    public static void verifyContactsPermissions(Activity activity) {
-        // Check if we have write permission
-        int permission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.READ_CONTACTS);
+    private boolean dialContact() {
+        String phoneNumber;
+        String id;
 
-        if (permission != PackageManager.PERMISSION_GRANTED) {
-            // We don't have permission so prompt the user
-            ActivityCompat.requestPermissions(
-                    activity,
-                    PERMISSIONS_CONTACTS,
-                    REQUEST_READ_CONTACTS
-            );
+        Cursor contact = getActivity().getContentResolver().query(
+                ContactsContract.Contacts.CONTENT_URI,
+                new String[]{
+                        ContactsContract.Contacts._ID
+                },
+                ContactsContract.Contacts.DISPLAY_NAME + " = ?",
+                new String[]{
+                        mCrime.getSuspect()
+                },
+                null
+        );
+
+        try{
+            if(contact.getCount() == 0)
+                return false;
+            contact.moveToFirst();
+            id = contact.getString(0);
+
+        }finally {
+            contact.close();
         }
+
+        Cursor phoneBook = getActivity().getContentResolver().query(
+                ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                new String[]{
+                        ContactsContract.CommonDataKinds.Phone.NUMBER
+                },
+                ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?",
+                new String[]{
+                        id
+                },
+                null
+        );
+
+        try{
+            if(phoneBook.getCount() == 0)
+                return false;
+            phoneBook.moveToFirst();
+            phoneNumber = phoneBook.getString(0);
+        }finally {
+            phoneBook.close();
+        }
+
+        // start new intent
+        Intent dialIntent = new Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + phoneNumber));
+        startActivity(dialIntent);
+
+        return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_READ_CONTACTS:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    dialContact();
+                } else {
+                    Toast.makeText(getActivity(),"Permission Denied. We can't read contacts.", Toast.LENGTH_SHORT).show();
+                }
+                break;
+        }
+    }
+
+    private boolean checkPermission(){
+        if (Build.VERSION.SDK_INT >= 23) {
+            int result = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_CONTACTS);
+             return result == PackageManager.PERMISSION_GRANTED;
+        } else {
+            return true;
+        }
+    }
+
+    public static void requestPermissions(Activity activity) {
+
+        ActivityCompat.requestPermissions(
+                activity,
+                PERMISSIONS_CONTACTS,
+                REQUEST_READ_CONTACTS
+        );
     }
 }
