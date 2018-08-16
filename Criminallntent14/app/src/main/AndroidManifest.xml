@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="cn.yclin.criminallntent">
-
+    <uses-feature android:name="android.hardware.camera"
+        android:required="false"
+        />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -22,6 +23,15 @@
             android:name=".CrimePagerActivity"
             android:parentActivityName=".CrimeListActivity"/>
         <activity android:name=".DatePickerActivity"></activity>
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="cn.yclin.android.criminalintent.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/files"/>
+        </provider>
     </application>
 
 </manifest>

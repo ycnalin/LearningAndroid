@@ -5,18 +5,23 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.content.res.Configuration;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.Point;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.ShareCompat;
+import android.support.v4.content.FileProvider;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -26,15 +31,20 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -49,15 +59,22 @@ public class CrimeFragment extends Fragment {
     private Button mReportButton;
     private Button mCallSuspect;
 
+    private ImageButton mPhotoButton;
+    private ImageView mPhotoView;
+    private File mPhotoFile;
+    private Point mPhotoViewSize;
+
     private static final String ARG_CRIME_ID = "crime_id";
     private static final String DIALOG_DATE = "DialogDate";
     private static final String DIALOG_TIME = "DialogTime";
+    private static final String DIALOG_PICTURE = "DialogPicture";
 
     private static final String TAG = "CrimeFragment";
 
     private static final int REQUEST_DATE = 0;
     private static final int REQUEST_TIME = 1;
     private static final int REQUEST_CONTACT = 2;
+    private static final int REQUEST_PHOTO= 3;
 
     // Contact Permissions
     private static final int REQUEST_READ_CONTACTS = 1;
@@ -86,9 +103,9 @@ public class CrimeFragment extends Fragment {
         //UUID crimeID = (UUID) getActivity().getIntent().getSerializableExtra(CrimeActivity.EXTRA_CRIME_ID);
         UUID crimeID = (UUID) getArguments().getSerializable(ARG_CRIME_ID);
         mCrime = CrimeLab.get(getActivity()).getCrime(crimeID);
+        mPhotoFile = CrimeLab.get(getActivity()).getPhotoFile(mCrime);
 
         setHasOptionsMenu(true);
-
     }
 
     @Nullable
@@ -212,6 +229,51 @@ public class CrimeFragment extends Fragment {
             mCallSuspect.setEnabled(false);
         }
 
+        mPhotoView = v.findViewById(R.id.crime_photo);
+        mPhotoView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                mPhotoViewSize = new Point();
+                mPhotoViewSize.set(mPhotoView.getWidth(), mPhotoView.getHeight());
+                updatePhotoView();
+                mPhotoView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+            }
+        });
+        mPhotoView.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                if(mPhotoFile != null && mPhotoFile.exists()){
+                    FragmentManager manager = getFragmentManager();
+                    PictureFragment dialog = PictureFragment.newInstance(mPhotoFile.getPath());
+                    //dialog.setTargetFragment(CrimeFragment.this, null);
+                    dialog.show(manager, DIALOG_PICTURE);
+                }
+            }
+        });
+
+        mPhotoButton=v.findViewById(R.id.crime_camera);
+        final Intent captureImage = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        boolean canTakePhoto = mPhotoFile != null &&
+                captureImage.resolveActivity(packageManager) != null;
+        mPhotoButton.setEnabled(canTakePhoto);
+        mPhotoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Uri uri = FileProvider.getUriForFile(getActivity(),
+                        "cn.yclin.android.criminalintent.fileprovider", mPhotoFile);
+                captureImage.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+                List<ResolveInfo> cameraActivities = getActivity()
+                        .getPackageManager().queryIntentActivities(captureImage,
+                                PackageManager.MATCH_DEFAULT_ONLY);
+                for (ResolveInfo activity : cameraActivities) {
+                    getActivity().grantUriPermission(activity.activityInfo.packageName,
+                            uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                }
+                startActivityForResult(captureImage, REQUEST_PHOTO);
+            }
+        });
+
+
         return v;
     }
 
@@ -274,6 +336,15 @@ public class CrimeFragment extends Fragment {
                 c.close();
             }
         }
+        else if(requestCode == REQUEST_PHOTO){
+            Uri uri = FileProvider.getUriForFile(getActivity(),
+                    "cn.yclin.android.criminalintent.fileprovider",
+                    mPhotoFile);
+            getActivity().revokeUriPermission(uri,
+                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            updatePhotoView();
+        }
+
 
     }
 
@@ -416,5 +487,15 @@ public class CrimeFragment extends Fragment {
                 PERMISSIONS_CONTACTS,
                 REQUEST_READ_CONTACTS
         );
+    }
+
+    private void updatePhotoView() {
+        if (mPhotoFile == null || !mPhotoFile.exists()) {
+            mPhotoView.setImageBitmap(null);
+        } else {
+            Bitmap bitmap = PictureUtils.getScaledBitmap(
+                    mPhotoFile.getPath(), mPhotoViewSize.x, mPhotoViewSize.y);
+            mPhotoView.setImageBitmap(bitmap);
+        }
     }
 }
