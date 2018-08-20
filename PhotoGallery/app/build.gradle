@@ -1,6 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        config {
+            keyAlias 'photoGallery'
+            keyPassword '141270021'
+            storeFile file('C:/Users/ycnal/AndroidStudioProjects/andriod_key.jks')
+            storePassword '141270021'
+        }
+    }
     compileSdkVersion 28
     defaultConfig {
         applicationId "cn.yclin.photogallery"
@@ -12,10 +20,15 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
+        }
+        debug {
+            signingConfig signingConfigs.config
         }
     }
+    buildToolsVersion '28.0.0'
 }
 
 dependencies {
@@ -26,4 +39,8 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'com.android.support:recyclerview-v7:28.0.0-rc01'
+    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.squareup.picasso:picasso:2.71828'
+    implementation 'com.android.support:animated-vector-drawable:28.0.0-rc01'
+    implementation 'com.android.support:exifinterface:28.0.0-rc01'
 }
