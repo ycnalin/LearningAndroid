@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="Pedometer">
+
+        <ListPreference
+            android:defaultValue="10.00"
+            android:entries="@array/Sensitivity"
+            android:entryValues="@array/Sensitivity"
+            android:key="sensitivity"
+            android:title="Set Sensitivity" />
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="isNotificationAollowed"
+            android:title="EnableNotification" />
+    </PreferenceCategory>
+</PreferenceScreen>

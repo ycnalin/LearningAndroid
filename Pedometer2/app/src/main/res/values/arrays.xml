@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="Sensitivity">
+        <item>4.44</item>
+        <item>6.66</item>
+        <item>10.00</item>
+        <item>15.00</item>
+        <item>22.50</item>
+        <item>33.75</item>
+    </string-array>
+</resources>
